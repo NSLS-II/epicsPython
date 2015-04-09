@@ -1,0 +1,37 @@
+This code sits on top of the PSI CaChannel interface for basic channel access support and the GSECARS Python library
+for beamline objects such as motors and scalers. To install the PSI CaChannel, just untar CaChannel-1.4_bin.tar 
+in a new directory and copy the contents into the python "site-packages" directory. On my system that was 
+/usr/lib/python2.5/site-packages. 
+The gsecars library is a subdirectory of this one. I added a couple of missing import statements and methods to 
+the source. Add <this directory> and <this directory>/gsecars and <this directory>/GUI 
+to your PYTHONPATH and you should be good to go.
+
+This code currently assumes pv names of the form <beamline>:<object>. For example, "x12c:mon", "x12c:scaler1". This
+is the convention normally followed at synchrotron beamlines. "bl_main.py" is the main program. It expects a configuration
+file of the form below. For now, we need to adhere strictly to the simple format and not add comments to the file. The
+first column for the motors is the pv name, the second is a descriptor. The descriptor can be anything (no spaces), but 
+the scaler must be labeled "main_counter". Below is my test configuration file (epx.db in this directory). 
+This configuration file must be pointed to by the environment variable EPICS_BEAMLINE_INFO. After executing
+"bl_main.py", you'll be able to run the commands in beamline.py and put new macros in "my_macros.py".
+There is fairly superficial documentation of beamline.py in beamline_doc.txt. "beamline.py" is a general starting point
+for beamline control. The basics are there, but it's not even close to complete. Beamline-specific stuff should go 
+in "my_macros". 
+
+If you want bl_main to talk to spec, just uncomment the obvious code at the top of bl_main.py.
+This depends on the ESRF SpecClient Python module, which is a trivial install.
+
+#beamline_designation
+x12c
+#real motors
+tv1 table_vert1
+tv2 table_vert2
+tv3 table_vert3
+mon monochromator
+#virtual motors
+tbv table_vert
+#scanned motors
+mon
+tbv
+#counters
+scaler1 main_counter
+
