@@ -16,13 +16,14 @@ import time
 from CaChannel import *
 
 
-global beamline_designation,motor_dict,soft_motor_list,scan_list,counter_dict,motor_channel_dict,counter_channel_dict,number_of_counter_readouts,scanparms_channel_dict,beamline_scan_record,scan_active_pv,scan_reference_counter,scan_detector_count,datafile_name
+global beamline_designation,motor_dict,soft_motor_list,scan_list,counter_dict,motor_channel_dict,counter_channel_dict,number_of_counter_readouts,scanparms_channel_dict,beamline_scan_record,scan_active_pv,scan_reference_counter,scan_detector_count,datafile_name,pvChannelDict
 
 motor_dict = {}
 counter_dict = {}
 motor_channel_dict = {}
 counter_channel_dict = {}
 scanparms_channel_dict = {}
+pvChannelDict = {}
 
 scan_list = []
 soft_motor_list = []
@@ -42,21 +43,25 @@ datafile_name = ""
 def set_any_epics_pv(pv_prefix,field_name,value): #this does not use beamline designation
   pvname = "%s.%s" % (pv_prefix,field_name)
   try:
-    PVchannel = epicsPV(pvname)
-    PVchannel.putw(value)
+    if (not pvChannelDict.has_key(pvname)):
+      pvChannelDict[pvname] = PVchannel = epicsPV(pvname)
+    if (pvChannelDict[pvname] != None):
+      pvChannelDict[pvname].putw(value)
   except CaChannelException, status:
     print ca.message(status)
     print "\n\nHandled Epics Error in set pv " + pvname + "\n\n"
-  pvClose(PVchannel)
 
 
 #convenience to set a pv value given the name
 def get_any_epics_pv(pv_prefix,field_name): #this does not use beamline designation
   pvname = "%s.%s" % (pv_prefix,field_name)
   try:
-    PVchannel = epicsPV(pvname)
-    pv_val = PVchannel.getw()
-    pvClose(PVchannel)
+    if (not pvChannelDict.has_key(pvname)):
+      pvChannelDict[pvname] = PVchannel = epicsPV(pvname)
+    if (pvChannelDict[pvname] != None):
+      pv_val = pvChannelDict[pvname].getw()
+    else:
+      pv_val = None
     return pv_val
   except CaChannelException, status:
     print ca.message(status)
