@@ -20,6 +20,7 @@ global beamline_designation,motor_dict,soft_motor_list,scan_list,counter_dict,mo
 
 motor_dict = {}
 counter_dict = {}
+pvLookupDict = {}
 motor_channel_dict = {}
 counter_channel_dict = {}
 scanparms_channel_dict = {}
@@ -85,6 +86,7 @@ def get_any_epics_pv(pv_prefix,field_name): #this does not use beamline designat
 def init_beamline():
   read_db()
   init_motors()
+#  initControlPVs()
 #  init_counters()
 #  init_scanparms()
   
@@ -435,9 +437,6 @@ def fly_scan(half_scan_width,stepsize,counter_number,count_time,motcode,real_mot
     set_scan_linear(motcode)
     set_count_time(1.0)
     
-def motor_code_from_descriptor(descriptor):
-  return motor_dict[descriptor]
-
 
 def waveform_to_string(wave):
   s = ""
@@ -499,12 +498,23 @@ def read_db():
         break
       else:
         line = line[:-1]
-        if (line == "#scanned motors"):
+        if (line == "#control PVs"):
           break
         else:
           motor_inf = split(line)
           soft_motor_list.append(beamline_designation + motor_inf[0])
           motor_dict[motor_inf[1]] = beamline_designation + motor_inf[0]          
+    while(1):
+      line = dbfile.readline()
+      if (line == ""):
+        break
+      else:
+        line = line[:-1]
+        if (line == "#scanned motors"):
+          break
+        else:
+          inf = split(line)
+          pvLookupDict[inf[1]] = beamline_designation + inf[0]          
     while(1):
       line = dbfile.readline()
       if (line == ""):
@@ -531,6 +541,16 @@ def init_motors():
       print ca.message(status)
       print "\n\nCould not create motor channel " + motor_dict[key] + "\n\n"
 
+def initControlPVs():
+  global pvChannelDict
+
+  for key in pvLookupDict.keys():
+    try:
+      pvChannelDict[pvLookupDict[key]] = pvCreate(pvLookupDict[key])
+    except CaChannelException, status:
+      print ca.message(status)
+      print "\n\nCould not create control PV " + pvLookupDict[key] + "\n\n"
+      
 
 def init_counters():
   global counter_channel_dict
@@ -589,12 +609,27 @@ def GScan(motcode):
     sys.stdout.write("No datafile name defined. Data not recorded.\n")
 
 
-def get_motor_code(beamline_desginated_code): # return motor code minus beamline designation
+def get_short_motor_code(beamline_desginated_code): # return motor code minus beamline designation
   i = find(beamline_desginated_code,beamline_designation)
   if (i>-1):
-    return beamline_desginated_code[len(beamline_designation)+1:len(beamline_desginated_code)]
+    return beamline_desginated_code[len(beamline_designation):len(beamline_desginated_code)]
+#    return beamline_desginated_code[len(beamline_designation)+1:len(beamline_desginated_code)]
   else:
     return beamline_desginated_code
 
 
+def pvNameSuffix_from_descriptor(descriptor): # for example - {Gon:1-Ax:O}Mtr = pvNameSuffix_from_descriptor("omega")
+  return get_short_motor_code(motor_code_from_descriptor(descriptor))
 
+def motor_code_from_descriptor(descriptor):
+  return motor_dict[descriptor]
+
+def pvNameFromDescriptor(descriptor): 
+  return pvLookupDict[descriptor]
+
+def getPvValFromDescriptor(descriptor):
+  return get_any_epics_pv(pvNameFromDescriptor(descriptor),"VAL")
+
+def setPvValFromDescriptor(descriptor,setval):
+  set_any_epics_pv(pvNameFromDescriptor(descriptor),"VAL",setval)
+  
