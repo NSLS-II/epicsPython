@@ -8,10 +8,10 @@ Modifications:
 """
 
 from epics import PV
-from PyQt4 import QtGui, QtCore
+from PyQt5 import QtCore, QtGui, QtWidgets
 import time
 
-class QtEpicsBaseWidget(QtGui.QWidget):
+class QtEpicsBaseWidget(QtWidgets.QWidget):
     """
     This module provides a class library for a GUI label field widget bound to an Epics PV. The PV is monitored
     and the field is updated when the PV changes
@@ -48,7 +48,7 @@ class QtEpicsBaseWidget(QtGui.QWidget):
 
         self.timer = QtCore.QTimer()
         self.timer.setInterval(self.highlight_interval)
-        QtCore.QObject.connect(self.timer, QtCore.SIGNAL("timeout()"), self.resetColor)
+        self.timer.timeout.connect(self.resetColor)
                 
         # Creates the PV
         self.base_pv = self.entry_pv = PV(pvname, connection_callback=self._conCB, callback=self._valueChangeCB)
@@ -60,7 +60,7 @@ class QtEpicsBaseWidget(QtGui.QWidget):
         
         self.__createWidget()
         
-        self.connect(self, QtCore.SIGNAL("changeColor"),self.setColor)
+        self.changeColor.connect(self.setColor)
         
         if (input_width != 0):
             self.entry.setFixedWidth(input_width)
@@ -71,19 +71,19 @@ class QtEpicsBaseWidget(QtGui.QWidget):
         except:
             self.entry_var = "-----"
             self.entry.setText(self.entry_var)
-            self.emit(QtCore.SIGNAL("changeColor"),"white")
+            self.changeColor.emit("white")
             return
     '''
     CALLBACKS SECTION
     '''
     def _conCB(self,conn,**kwargs):
         if (conn):
-            self.emit(QtCore.SIGNAL("changeColor"),"blue")
+            self.changeColor.emit("blue")
             # self.entry.configure(background="#729fff")
         else:
             self.entry_var = "-----"
             self.entry.setText(self.entry_var)
-            self.emit(QtCore.SIGNAL("changeColor"),"white")
+            self.changeColor.emit("white")
     
     def _valueChangeCB(self,value,char_value,**kwargs):
         try:
@@ -111,9 +111,9 @@ class QtEpicsBaseWidget(QtGui.QWidget):
 
     def __createWidget(self):
         if(self.editable):
-            self.entry = QtGui.QLineEdit(self.parent)
+            self.entry = QtWidgets.QLineEdit(self.parent)
         else:
-            self.entry = QtGui.QLabel(self.parent)
+            self.entry = QtWidgets.QLabel(self.parent)
 
     def __updateValue(self, value, skipHighlight=False):
         if(self.enum_strs == None):
@@ -122,12 +122,12 @@ class QtEpicsBaseWidget(QtGui.QWidget):
             self._set_entry_var_with_precision(self.enum_strs[value])
         self.entry.setText(self.entry_var)
         if(self.highlight_on_change and not skipHighlight):
-            self.emit(QtCore.SIGNAL("changeColor"),"#99FF66")
+            self.changeColor.emit("#99FF66")
             self.timer.start()      
 
     def resetColor(self):
         self.timer.stop()
-        self.emit(QtCore.SIGNAL("changeColor"),"None")
+        self.changeColor.emit("None")
 
     '''
     GETTERS/SETTERS SECTION

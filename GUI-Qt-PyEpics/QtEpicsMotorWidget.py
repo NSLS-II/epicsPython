@@ -8,10 +8,10 @@ Modifications:
 """
 
 from epics import PV
-from PyQt4 import QtGui, QtCore
+from PyQt5 import QtCore, QtGui, QtWidgets
 import time
 
-class QtEpicsMotorWidget(QtGui.QWidget):
+class QtEpicsMotorWidget(QtWidgets.QWidget):
    """
    This module provides a class library for a GUI label field widget bound to an Epics PV. The PV is monitored
    and the field is updated when the PV changes
@@ -49,9 +49,9 @@ class QtEpicsMotorWidget(QtGui.QWidget):
       self.base_pv = PV(pvname)
       
       if(self.editable):
-         self.entry = QtGui.QLineEdit(parent)
+         self.entry = QtWidgets.QLineEdit(parent)
       else:
-         self.entry = QtGui.QLabel(parent)
+         self.entry = QtWidgets.QLabel(parent)
          
       if (input_width != 0):
         self.entry.setFixedWidth(input_width)
@@ -63,10 +63,10 @@ class QtEpicsMotorWidget(QtGui.QWidget):
       except:
         self.entry_var = "-----"
         self.entry.setText(self.entry_var)
-        self.emit(QtCore.SIGNAL("changeColor"),"white")
+        self.changeColor.emit("white")
         return
     
-      self.connect(self, QtCore.SIGNAL("changeColor"),self.setColor)
+      self.changeColor.connect(self.setColor)
       self.entry_pv.add_callback(self._entry_pv_movingCb)
       self.entry_dmov_pv = PV(pvname+".DMOV")
       self.entry_dmov_pv.add_callback(self._entry_pv_dmovCb)
@@ -76,12 +76,12 @@ class QtEpicsMotorWidget(QtGui.QWidget):
 
 #     print "in Con callback %d" % epics_args[1]
      if (conn):
-        self.emit(QtCore.SIGNAL("changeColor"),"blue")
+        self.changeColor.emit("blue")
 #          self.entry.configure(background="#729fff")
      else:
        self.entry_var = "-----"
        self.entry.setText(self.entry_var)
-       self.emit(QtCore.SIGNAL("changeColor"),"white")
+       self.changeColor.emit("white")
 
    def _entry_pv_movingCb(self,value,**kwargs):
 #      print "in callback " + str(epics_args['pv_value']) + " " + ca.dbf_text(epics_args['type'])
@@ -92,10 +92,10 @@ class QtEpicsMotorWidget(QtGui.QWidget):
    def _entry_pv_dmovCb(self,value,**kwargs):
 #      print "in callback " + str(epics_args['pv_value'])
       if (value == 1):
-        self.emit(QtCore.SIGNAL("changeColor"),"None")
+        self.changeColor.emit("None")
       else:
 #        self.emit(QtCore.SIGNAL("changeColor"),"#99FF66")          
-        self.emit(QtCore.SIGNAL("changeColor"),"yellow")
+        self.changeColor.emit("yellow")
 
 
         

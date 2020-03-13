@@ -8,7 +8,7 @@ Modifications:
 Apr. 20, 2015 - Hugo Slepicka - Changing from caChannel to PyEpics
 """
 
-from PyQt4 import QtGui, QtCore
+from PyQt5 import QtCore
 from QtEpicsBaseWidget import QtEpicsBaseWidget
 import time
 

@@ -5,14 +5,14 @@ Created on Apr 20, 2015
 @author: slepicka
 '''
 import sys
-from PyQt4 import QtGui
+from PyQt5 import QtGui, QtWidgets
 from QtEpicsMotorLabel import QtEpicsMotorLabel
 from QtEpicsMotorEntry import QtEpicsMotorEntry
 from QtEpicsPVLabel import QtEpicsPVLabel
 from QtEpicsPVEntry import QtEpicsPVEntry
 
 
-class MainWindow(QtGui.QWidget):
+class MainWindow(QtWidgets.QWidget):
     def __init__(self):
         super(MainWindow, self).__init__()
         self.initUI()
@@ -21,7 +21,7 @@ class MainWindow(QtGui.QWidget):
         # Add components here
         self.labelM1RBV = QtEpicsMotorLabel("XF:AMXFMX{MC-Goni}Omega", self, 70, 5)
         self.editM1RBV = QtEpicsMotorEntry("XF:AMXFMX{MC-Goni}Omega", self, 70, 5)
-        self.moveM1Btn = QtGui.QPushButton("Move", self)
+        self.moveM1Btn = QtWidgets.QPushButton("Move", self)
         self.moveM1Btn.clicked.connect(self.moveM1BtnClicked)              
         
         self.labelM1Pos = QtEpicsPVLabel("XF:AMXFMX{MC-Goni}Omega.CNEN", self, 70, 5)
@@ -29,7 +29,7 @@ class MainWindow(QtGui.QWidget):
         
         self.editM1Velo = QtEpicsPVEntry("XF:AMXFMX{MC-Goni}Omega.VELO", self, 70, 5)
                 
-        grid = QtGui.QGridLayout()
+        grid = QtWidgets.QGridLayout()
         grid.setSpacing(10)
         grid.addWidget(self.labelM1RBV.getEntry(), 1, 0)
         grid.addWidget(self.editM1RBV.getEntry(), 1, 1)
@@ -47,7 +47,7 @@ class MainWindow(QtGui.QWidget):
         
     def center(self):        
         qr = self.frameGeometry()
-        cp = QtGui.QDesktopWidget().availableGeometry().center()
+        cp = QtWidgets.QDesktopWidget().availableGeometry().center()
         qr.moveCenter(cp)
         self.move(qr.topLeft())
         
@@ -55,7 +55,7 @@ class MainWindow(QtGui.QWidget):
         self.editM1RBV.getBasePV().put(self.editM1RBV.getEntry().text())
 
 def main():
-    app = QtGui.QApplication(sys.argv)
+    app = QtWidgets.QApplication(sys.argv)
     w = MainWindow()    
     sys.exit(app.exec_())
     
