@@ -17,7 +17,7 @@ class QtEpicsBaseWidget(QtWidgets.QWidget):
     and the field is updated when the PV changes
     
     """
-    changeColor = QtCore.pyqtSignal()
+    changeColor = QtCore.pyqtSignal(str)
     
     def __init__(self, pvname, parent, input_width, precision = 2, editable=False, highlight_on_change=True, highlight_interval=2000):
         """
