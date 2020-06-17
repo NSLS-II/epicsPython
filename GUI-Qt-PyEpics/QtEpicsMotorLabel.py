@@ -8,7 +8,7 @@ Modifications:
 Apr. 20, 2015 - Hugo Slepicka - Changing from caChannel to PyEpics
 """
 
-from PyQt5 import QtCore
+from qtpy import QtCore
 from QtEpicsMotorWidget import QtEpicsMotorWidget
 import time
 

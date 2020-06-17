@@ -5,7 +5,7 @@ Created on Apr 20, 2015
 @author: slepicka
 '''
 import sys
-from PyQt5 import QtGui, QtWidgets
+from qtpy import QtGui, QtWidgets
 from QtEpicsMotorLabel import QtEpicsMotorLabel
 from QtEpicsMotorEntry import QtEpicsMotorEntry
 from QtEpicsPVLabel import QtEpicsPVLabel

@@ -8,7 +8,7 @@ Modifications:
 """
 
 from epics import PV
-from PyQt5 import QtCore, QtGui, QtWidgets
+from qtpy import QtCore, QtGui, QtWidgets
 import time
 
 class QtEpicsBaseWidget(QtWidgets.QWidget):
