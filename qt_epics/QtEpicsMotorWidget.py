@@ -17,7 +17,7 @@ class QtEpicsMotorWidget(QtWidgets.QWidget):
    and the field is updated when the PV changes
 
    """
-   changeColor = QtCore.pyqtSignal() 
+   changeColor = QtCore.Signal(str) 
 
    def __init__(self, pvname, parent, input_width, precision = 2, editable=False):
       """
