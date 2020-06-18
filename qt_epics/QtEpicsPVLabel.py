@@ -9,7 +9,7 @@ Apr. 20, 2015 - Hugo Slepicka - Changing from caChannel to PyEpics
 """
 
 from qtpy import QtCore
-from QtEpicsBaseWidget import QtEpicsBaseWidget
+from qt_epics.QtEpicsBaseWidget import QtEpicsBaseWidget
 import time
 
 class QtEpicsPVLabel(QtEpicsBaseWidget):

@@ -9,7 +9,7 @@ Apr. 20, 2015 - Hugo Slepicka - Changing from caChannel to PyEpics
 """
 
 from qtpy import QtCore
-from QtEpicsMotorWidget import QtEpicsMotorWidget
+from qt_epics.QtEpicsMotorWidget import QtEpicsMotorWidget
 import time
 
 class QtEpicsMotorLabel(QtEpicsMotorWidget):
