@@ -11,6 +11,9 @@ from epics import PV
 from qtpy import QtCore, QtGui, QtWidgets
 import time
 
+STOPIFACTIVESIGNAL = 'stopifactive'
+STARTSIGNAL = 'start'
+
 class QtEpicsBaseWidget(QtWidgets.QWidget):
     """
     This module provides a class library for a GUI label field widget bound to an Epics PV. The PV is monitored
@@ -18,6 +21,7 @@ class QtEpicsBaseWidget(QtWidgets.QWidget):
     
     """
     changeColor = QtCore.Signal(str)
+    timerSignal = QtCore.Signal(str)
     
     def __init__(self, pvname, parent, input_width, precision = 2, editable=False, highlight_on_change=True, highlight_interval=2000):
         """
@@ -49,6 +53,8 @@ class QtEpicsBaseWidget(QtWidgets.QWidget):
         self.timer = QtCore.QTimer()
         self.timer.setInterval(self.highlight_interval)
         self.timer.timeout.connect(self.resetColor)
+
+        self.timerSignal.connect(self.timerSignalHandler)
                 
         # Creates the PV
         self.base_pv = self.entry_pv = PV(pvname, connection_callback=self._conCB, callback=self._valueChangeCB)
@@ -87,8 +93,7 @@ class QtEpicsBaseWidget(QtWidgets.QWidget):
     
     def _valueChangeCB(self,value,char_value,**kwargs):
         try:
-            if(self.timer.isActive()):
-                self.timer.stop()
+            self.timerSignal.emit(STOPIFACTIVE)
             self.__updateValue(char_value)
         except:
             pass           
@@ -123,12 +128,18 @@ class QtEpicsBaseWidget(QtWidgets.QWidget):
         self.entry.setText(self.entry_var)
         if(self.highlight_on_change and not skipHighlight):
             self.changeColor.emit("#99FF66")
-            self.timer.start()      
+            self.timerSignal.emit(STARTSIGNAL)
 
     def resetColor(self):
         self.timer.stop()
         self.changeColor.emit("None")
 
+    def timerSignalHandler(self, command):
+        if command == STARTSIGNAL:
+            self.timer.start()
+        elif command == STOPIFACTIVESIGNAL:
+            if self.timer.isActive():
+                self.timer.stop()
     '''
     GETTERS/SETTERS SECTION
     '''
