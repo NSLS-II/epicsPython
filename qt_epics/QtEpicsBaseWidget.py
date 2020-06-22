@@ -93,7 +93,7 @@ class QtEpicsBaseWidget(QtWidgets.QWidget):
     
     def _valueChangeCB(self,value,char_value,**kwargs):
         try:
-            self.timerSignal.emit(STOPIFACTIVE)
+            self.timerSignal.emit(STOPIFACTIVESIGNAL)
             self.__updateValue(char_value)
         except:
             pass           
